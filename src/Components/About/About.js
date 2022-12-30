@@ -1,56 +1,45 @@
-import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthProvider';
 
 const About = () => {
+    const { user } = useContext(AuthContext)
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const imagehoskey = "f8abb6d450f3ebe88a068da1d4b26fa7";
     const navigate = useNavigate()
 
+
+
+    const { data: info = [], refetch, isLoading } = useQuery({
+        queryKey: ["posts"],
+        queryFn: async () => {
+            const res = await fetch(`http://localhost:5000/about/${user?.email}`);
+            const data = await res.json();
+            //console.log(data)
+            return data;
+        }
+    })
+
     const handleEditInfo = data => {
         console.log(data)
-        const image = data.image[0];
-        const formData = new FormData()
-        formData.append("image", image)
-        const url = `https://api.imgbb.com/1/upload?key=${imagehoskey}`
-        fetch(url, {
+
+        fetch("http://localhost:5000/about", {
             method: "POST",
-            body: formData
+            headers: {
+                "content-type": "application/json",
+            },
+            body: JSON.stringify(data)
         })
             .then(res => res.json())
-            .then(imgdata => {
-                if (imgdata.success) {
-                    // //console.log(imgdata.data.url)
-                    // const productData = {
-                    //     categoryId: data.categoryId,
-                    //     name: data.name,
-                    //     Location: data.Location,
-                    //     resalePrice: data.resalePrice,
-                    //     originalPrice: data.originalPrice,
-                    //     postTime: Date().slice(0, 15),
-                    //     img: imgdata.data.url,
-                    //     email: data.email,
-                    //     bookingType: "Book Now",
-                    //     advertise: false
-
-                    // }
-                    // //console.log(productData.postTime)
-                    // fetch("https://sell-point-server.vercel.app/addproduct", {
-                    //     method: "POST",
-                    //     headers: {
-                    //         "content-type": "application/json",
-                    //     },
-                    //     body: JSON.stringify(productData)
-                    // })
-                    //     .then(res => res.json())
-                    //     .then(res => {
-                    //         //console.log(res)
-                    //         navigate("/dashboard/myproducts")
-                    //         reset()
-                    //     })
-                }
+            .then(res => {
+                console.log(res)
             })
     }
+
+    console.log(user)
+
     return (
         <div className='min-h-screen'>
             {/* The button to open modal */}
@@ -62,13 +51,13 @@ const About = () => {
                 <div className='grid grid-cols-8'>
                     <div className='col-span-3 avatar'>
                         <div className="w-64 rounded-full">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSzHQv_th9wq3ivQ1CVk7UZRxhbPq64oQrg5Q&usqp=CAU" />
+                            <img src={user?.photoURL} alt="" />
                         </div>
                     </div>
                     <div className="divider divider-horizontal"></div>
                     <div className='col-span-4'>
                         <h1 className='text-xl'>Name:</h1>
-                        <h1 className='text-xl'>Email:</h1>
+                        <h1 className='text-xl'>Email: {user?.email}</h1>
                         <h1 className='text-xl'>University:</h1>
                         <h1 className='text-xl'>Address:</h1>
 
@@ -98,7 +87,7 @@ const About = () => {
                                 <label className="label"> <span className="label-text">Your Email</span></label>
                                 <input type="email" {...register("email", {
                                     required: true
-                                })} className="input input-bordered w-full " />
+                                })} className="input input-bordered w-full " defaultValue={user?.email} readOnly />
                             </div>
                             <div className="form-control w-full ">
                                 <label className="label"> <span className="label-text">University</span></label>

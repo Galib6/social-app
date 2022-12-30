@@ -13,7 +13,6 @@ const SignUp = () => {
     const { register, handleSubmit, formState: { errors }, reset } = useForm();
     const { createUser, updateUser, setUser, signInwithGoolge, setLoading } = useContext(AuthContext);
     const [signUpError, setSignUPError] = useState('')
-    const navigate = useNavigate();
     const provider = new GoogleAuthProvider();
 
 
@@ -33,7 +32,7 @@ const SignUp = () => {
                 updateUser(userInfo)
                     .then(result => {
                         toast.success("Sucessfully Logged in")
-                        // saveUser(data.name, data.email, data.password, data.type)
+                        saveUser(data.name, data.email, data.password)
                         reset()
 
                     })
@@ -45,21 +44,19 @@ const SignUp = () => {
             });
     }
 
-    // const saveUser = (name, email, password, type) => {
-    //     const user = { name, email, password, type }
-    //     fetch("https://sell-point-server.vercel.app/users", {
-    //         method: "POST",
-    //         headers: {
-    //             "content-type": "application/json"
-    //         },
-    //         body: JSON.stringify(user)
-    //     })
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             // setCreatedUserEmail(email);
-    //             //console.log(data)
-    //         })
-    // }
+    const saveUser = (name, email, password) => {
+        const user = { name, email, password }
+        fetch("http://localhost:5000/users", {
+            method: "POST",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify(user)
+        })
+            .then(res => res.json())
+            .then(data => {
+            })
+    }
 
     const handleGoogleSignIn = () => {
         signInwithGoolge(provider)
@@ -69,45 +66,21 @@ const SignUp = () => {
                 setUser(user)
                 toast.success("Seccessfully Sign up")
 
-                // const currentUser = {
-                //     email: user.email
-                // }
-
-                //console.log(currentUser)
-                // get jwt token
-                // fetch('https://sell-point-server.vercel.app/jwt', {
-                //     method: 'POST',
-                //     headers: {
-                //         'content-type': 'application/json'
-                //     },
-                //     body: JSON.stringify(currentUser)
-                // })
-
-                // .then(res => res.json())
-                // .then(data => {
-                //     //console.log(data);
-                //     // local storage is the easiest but not the best place to store jwt token
-                //     localStorage.setItem('s-token', data.token);
-                // });
-
                 const userData = {
                     name: user.displayName,
                     email: user.email
 
                 }
-                // fetch("https://sell-point-server.vercel.app/gsignup", {
-                //     method: "POST",
-                //     headers: {
-                //         "content-type": "application/json",
-                //         // authorization: `bearer ${localStorage.getItem("s-token")}`
-                //     },
-                //     body: JSON.stringify(userData)
-                // })
-                //     .then(res => res.json())
-                //     .then(res => {
-                //         //console.log(res)
-                //         setLoading(false)
-                //     })
+                fetch("http://localhost:5000/users", {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json"
+                    },
+                    body: JSON.stringify(userData)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                    })
 
                 setLoading(false)
             })
